@@ -21,12 +21,35 @@ $request = explode("/", trim($_SERVER["REQUEST_URI"], "/"));
 $method = $_SERVER["REQUEST_METHOD"];
 
 // Identificar la posición del controlador en la URL
-$index = array_search("apiphp", $request); // Ajusta si cambia la estructura
+$index = array_search("apiphp", $request);
 if ($index === false || !isset($request[$index + 1])) {
     http_response_code(400);
     echo json_encode(["message" => "Solicitud incorrecta"]);
     exit();
 }
+
+// Manejo de rutas especiales para autenticación
+if ($request[$index + 1] === "auth") {
+    $authAction = $request[$index + 2] ?? null;
+
+    if ($authAction === "login") {
+        require_once __DIR__ . "/auth/login.php";
+        exit();
+    }
+
+    if ($authAction === "validate") {
+        require_once __DIR__ . "/auth/validate.php";
+        exit();
+    }
+
+    http_response_code(404);
+    echo json_encode(["message" => "Acción de autenticación no válida"]);
+    exit();
+}
+
+// 🔒 **Proteger todo menos login/validate**
+require_once 'auth/authMiddleware.php';
+verifyToken(); // Si no pasa, corta aquí mismo el flujo
 
 // Obtener el controlador
 $table = ucfirst(strtolower($request[$index + 1])) . "Controller";
@@ -45,6 +68,7 @@ $tableController = new $table();
 // Obtener el ID si existe en la URL
 $id = $request[$index + 2] ?? null;
 
+// 🚀 **Manejar métodos CRUD**
 switch ($method) {
     case 'GET':
         if ($id) {
