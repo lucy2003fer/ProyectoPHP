@@ -37,8 +37,8 @@ if ($request[$index + 1] === "auth") {
         exit();
     }
 
-    if ($authAction === "validate") {
-        require_once __DIR__ . "/auth/validate.php";
+    if ($authAction === "authMiddleware") {
+        require_once __DIR__ . "/auth/authMiddleware.php";
         exit();
     }
 
@@ -47,7 +47,7 @@ if ($request[$index + 1] === "auth") {
     exit();
 }
 
-// 🔒 **Proteger todo menos login/validate**
+// Proteger todo menos login/validate
 require_once 'auth/authMiddleware.php';
 verifyToken(); // Si no pasa, corta aquí mismo el flujo
 
