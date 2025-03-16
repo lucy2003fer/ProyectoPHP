@@ -1,13 +1,17 @@
 <?php
 require_once(__DIR__ . '/../config/dataBase.php');
-
 require_once(__DIR__ . '/../models/Usuario.php');
-
 require_once(__DIR__ . '/../vendor/autoload.php');
-
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+
+//Bloquear solicitudes que no sean POST
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    echo json_encode(["message" => "Método no permitido"]);
+    http_response_code(405);
+    exit();
+}
 
 // Conexión DB
 $database = new Database();
@@ -31,7 +35,6 @@ if (!$user || !password_verify($data['contrasena'], $user['contrasena'])) {
     exit();
 }
 
-
 // Generamos el JWT
 $secret_key = "lucy";
 $payload = [
@@ -49,3 +52,4 @@ $jwt = JWT::encode($payload, $secret_key, 'HS256');
 
 echo json_encode(["token" => $jwt]);
 http_response_code(200);
+
