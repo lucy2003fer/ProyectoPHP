@@ -1,13 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+export interface Rol {
+  id_rol: number;
+  nombre_rol: string;
+  fecha_creacion : string;
+}
+
 // Definir el tipo de Usuario basado en la API
 interface Usuario {
   identificacion: number;
   nombre: string;
   contrasena: string;
   email: string;
-  fk_id_rol: number;
+  fk_id_rol: Rol | null;
 }
 
 // Función para obtener los usuarios desde la API
