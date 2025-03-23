@@ -12,11 +12,34 @@ interface Usuario {
 
 // Función para obtener los usuarios desde la API
 const fetchUsuarios = async (): Promise<Usuario[]> => {
-  const { data } = await axios.get<{ status: number; data: Usuario[] }>(
-    `${import.meta.env.VITE_API_URL}/usuario`
-  );
-  
-  return data.data || []; // Asegurar que devuelve un array
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const token = localStorage.getItem("token");
+
+  if (!apiUrl) {
+    throw new Error("La URL de la API no está definida en las variables de entorno.");
+  }
+
+  if (!token) {
+    throw new Error("No hay token disponible, inicia sesión nuevamente.");
+  }
+
+  try {
+    const { data } = await axios.get<{ status: number; data: Usuario[] }>(
+      `${apiUrl}/usuario`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 👈 Enviando el token
+        },
+        withCredentials: true, // 👈 Asegura que se envíen cookies si la API las usa
+      }
+    );
+
+    return data.data || []; // Asegurar que devuelve un array
+  } catch (error: any) {
+    console.error("Error al obtener usuarios:", error);
+    throw new Error(error.response?.data?.message || "Error al obtener los usuarios");
+  }
 };
 
 // Hook personalizado para obtener usuarios

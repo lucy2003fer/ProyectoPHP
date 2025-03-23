@@ -1,4 +1,4 @@
-import { useUsuarios } from "../hooks/useUsuario";
+import { useUsuarios } from "../../hooks/useUsuario";
 
 const Usuarios = () => {
   const { data: usuarios, isLoading, error } = useUsuarios();

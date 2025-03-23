@@ -1,4 +1,4 @@
-import Usuarios from '../components/Usuarios';
+import Usuarios from '../components/usuarios/Usuarios';
 
 const UsuarioPage = () => {
     return (

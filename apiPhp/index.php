@@ -6,9 +6,12 @@ error_reporting(E_ALL);
 
 // Encabezados para permitir el acceso desde el frontend
 header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Content-Type: application/json; charset=UTF-8");
+
+
 
 // Manejar solicitudes OPTIONS (CORS Preflight)
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
