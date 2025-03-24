@@ -3,15 +3,15 @@ import axios from "axios";
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
-export const useUsuariosId = (identificacion: string | undefined) => {
+export const useRolId = (id_rol: string | undefined) => {
     return useQuery({
-        queryKey: ["usuario", identificacion], 
+        queryKey: ["rol", id_rol], 
         queryFn: async () => {
-            if (!identificacion) throw new Error("ID no proporcionado");
-            const { data } = await axios.get(`${apiUrl}usuario/${identificacion}`);
+            if (!id_rol) throw new Error("ID no proporcionado");
+            const { data } = await axios.get(`${apiUrl}rol/${id_rol}`);
             console.log("🌱 Datos obtenidos del backend:", data); // 👀 Verifica los datos
             return data;
         },
-        enabled: !!identificacion, 
+        enabled: !!id_rol, 
     });
 };

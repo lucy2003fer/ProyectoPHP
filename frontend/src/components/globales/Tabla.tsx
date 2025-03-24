@@ -133,7 +133,7 @@ const Tabla = <T extends { [key: string]: any }>({
           ))}
           {onCreate && ( // 👈 Botón de crear usuario
             <Button
-              text="Crear Usuario"
+              text="Agregar"
               onClick={onCreate}
               variant="success"
               className="ml-4"
@@ -219,7 +219,7 @@ const Tabla = <T extends { [key: string]: any }>({
         </table>
       </div>
 
-      <div className="flex justify-end mt-8">
+      <div className="flex justify-center mt-8">
         <Pagination
           total={Math.ceil(sortedData.length / rowsPerPage)}
           page={currentPage}

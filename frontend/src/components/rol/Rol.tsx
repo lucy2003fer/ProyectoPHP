@@ -1,82 +1,113 @@
-import { useState, useCallback } from 'react';
-import { useRol } from '../../hooks/rol/useRol'
-import Tabla from '../globales/Tabla';
-import VentanaModal from '../globales/VentanasModales';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRol } from "@/hooks/rol/useRol";
+import useEditarRol from "@/hooks/rol/useEditarRol";
+import Tabla from "../../components/globales/Tabla";
+import FormularioModal from "../../components/globales/FormularioModal";
+import VentanaModales from "../../components/globales/VentanasModales";
+import type { Rol } from "@/hooks/rol/useEditarRol";
 
 const Rol = () => {
-  const { data: rol, isLoading, error } = useRol();
-  const [selectedUser, setSelectedUser] = useState<Record<string, any> | null>(null);
+  const navigate = useNavigate();
+  const { data: roles, isLoading, isError } = useRol();
+  const { mutate: editarRol } = useEditarRol();
+  const [rolEditando, setRolEditando] = useState<Rol | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [rolDetalles, setRolDetalles] = useState<Rol | null>(null);
+  const [isDetallesModalOpen, setIsDetallesModalOpen] = useState(false);
 
-  // Abrir modal con un usuario seleccionado
-  const openModalHandler = useCallback((rol: Record<string, any>, action: string) => {
-    setSelectedUser(rol);
-    if (action === "ver") {
-      setIsModalOpen(true); // Abrir modal solo para "Ver detalles"
-    } else if (action === "editar") {
-      console.log("Editar rol:", rol); // Lógica para editar
+  const handleCrearRol = () => {
+    navigate("/crearrol");
+  };
+
+  const handleEditarRol = (rol: Rol) => {
+    setRolEditando(rol);
+    setIsModalOpen(true);
+  };
+
+  const handleVerDetalles = (rol: Rol) => {
+    setRolDetalles(rol);
+    setIsDetallesModalOpen(true);
+  };
+
+  const handleSubmit = (datosActualizados: Record<string, any>) => {
+    if (rolEditando) {
+      editarRol({ 
+        ...rolEditando, 
+        ...datosActualizados,
+        fecha_creacion: new Date(datosActualizados.fecha_creacion).toISOString().split('T')[0]
+      });
     }
-  }, []);
-
-  // Cerrar modal
-  const closeModal = useCallback(() => {
-    setSelectedUser(null);
     setIsModalOpen(false);
-  }, []);
+  };
 
-  // Encabezados de la tabla
-  const headers = [
-    { key: 'id_rol', label: 'ID' },
-    { key: 'nombre_rol', label: 'Rol' },
-    { key: 'fecha_creacion', label: 'Creación' }
+  const campos = [
+    { 
+      key: "nombre_rol", 
+      label: "Nombre del Rol", 
+      type: "text",
+      required: true 
+    },
+    { 
+      key: "fecha_creacion", 
+      label: "Fecha de creación", 
+      type: "date",
+      required: true 
+    },
   ];
 
+  if (isLoading) return <div>Cargando roles...</div>;
+  if (isError) return <div>Error al cargar los roles</div>;
+
   return (
-    <div className="overflow-x-auto bg-white shadow-md rounded-lg p-4">
-      {/* Estado de carga */}
-      {isLoading && <div className="text-center text-gray-500">Cargando Roles...</div>}
+    <div>
+      <Tabla
+        title="Roles"
+        headers={[
+          { key: "id_rol", label: "ID" },
+          { key: "nombre_rol", label: "Nombre del Rol" },
+          { 
+            key: "fecha_creacion", 
+            label: "Fecha de creación",
+            render: (row: Rol) => new Date(row.fecha_creacion).toLocaleDateString()
+          },
+        ]}
+        data={roles || []}
+        onClickAction={(row, action) => {
+          if (action === "editar") {
+            handleEditarRol(row);
+          } else if (action === "ver") {
+            handleVerDetalles(row);
+          }
+        }}
+        onCreate={handleCrearRol}
+        searchFields={["nombre_rol"]}
+      />
 
-      {/* Errores */}
-      {error instanceof Error && (
-        <div className="text-center text-red-500">
-          Error al cargar los rol: {error.message}
-        </div>
-      )}
-
-      {/* Sin datos */}
-      {!isLoading && !error && (!Array.isArray(rol) || rol.length === 0) && (
-        <div className="text-center text-gray-500">No hay rol registrados.</div>
-      )}
-
-      {/* Tabla de rol */}
-      {Array.isArray(rol) && rol.length > 0 && (
-        <Tabla
-          title="Lista de rol"
-          headers={headers}
-          data={rol.map(rol => ({
-            id_rol: rol.id_rol,
-            nombre_rol: rol.nombre_rol,
-            fecha_creacion: rol.fecha_creacion
-          }))}
-          onClickAction={openModalHandler} // 👈 Pasar la función de acciones
-          searchFields={["nombre_rol"]} // Buscar por nombre o identificación
-          filters={[
-            {
-              key: "nombre_rol",
-              label: "Rol",
-              options: ["pasante", "instructor", "invitado"], // Opciones de filtro
-            },
-          ]}
+      {rolEditando && (
+        <FormularioModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          titulo="Editar Rol"
+          campos={campos}
+          datosIniciales={{
+            nombre_rol: rolEditando.nombre_rol,
+            fecha_creacion: rolEditando.fecha_creacion.split('T')[0]
+          }}
+          onSubmit={handleSubmit}
         />
       )}
 
-      {/* Modal de usuario */}
-      {selectedUser && (
-        <VentanaModal 
-          isOpen={isModalOpen} 
-          onClose={closeModal} 
-          titulo="Detalles del rol" 
-          contenido={selectedUser} 
+      {rolDetalles && (
+        <VentanaModales
+          isOpen={isDetallesModalOpen}
+          onClose={() => setIsDetallesModalOpen(false)}
+          contenido={{
+            "ID": rolDetalles.id_rol,
+            "Nombre del Rol": rolDetalles.nombre_rol,
+            "Fecha de creación": new Date(rolDetalles.fecha_creacion).toLocaleDateString(),
+          }}
+          titulo="Detalles del Rol"
         />
       )}
     </div>
