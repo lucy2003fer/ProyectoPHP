@@ -1,25 +1,34 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 import { useUsuarios } from "@/hooks/usuarios/useUsuario";
 import { useRol } from "@/hooks/rol/useRol";
 import useEditarUsuario, { Usuario } from "@/hooks/usuarios/useEditarUsuario";
 import Tabla from "../../components/globales/Tabla";
 import FormularioModal from "../../components/globales/FormularioModal";
+import VentanaModales from "../../components/globales/VentanasModales"; // Importar VentanaModal
 
 const Usuarios = () => {
+  const navigate = useNavigate(); // Hook para redirigir
   const { data: usuarios, isLoading, isError } = useUsuarios();
   const { data: roles } = useRol();
   const { mutate: editarUsuario } = useEditarUsuario();
   const [usuarioEditando, setUsuarioEditando] = useState<Usuario | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [usuarioDetalles, setUsuarioDetalles] = useState<Usuario | null>(null); // Estado para detalles
+  const [isDetallesModalOpen, setIsDetallesModalOpen] = useState(false); // Estado para ventana modal de detalles
 
   const handleCrearUsuario = () => {
-    // Lógica para crear un nuevo usuario
-    console.log("Crear nuevo usuario");
+    navigate("/crearusuario"); // Redirigir a /crearusuario
   };
 
   const handleEditarUsuario = (usuario: Usuario) => {
     setUsuarioEditando(usuario);
     setIsModalOpen(true);
+  };
+
+  const handleVerDetalles = (usuario: Usuario) => {
+    setUsuarioDetalles(usuario); // Establecer el usuario para ver detalles
+    setIsDetallesModalOpen(true); // Abrir la ventana modal de detalles
   };
 
   const handleSubmit = (datosActualizados: Record<string, any>) => {
@@ -61,6 +70,8 @@ const Usuarios = () => {
         onClickAction={(row, action) => {
           if (action === "editar") {
             handleEditarUsuario(row);
+          } else if (action === "ver") {
+            handleVerDetalles(row); // Manejar la acción "ver detalles"
           }
         }}
         onCreate={handleCrearUsuario} // 👈 Botón de crear usuario
@@ -78,6 +89,20 @@ const Usuarios = () => {
             fk_id_rol: usuarioEditando?.fk_id_rol?.id_rol || "",
           }}
           onSubmit={handleSubmit}
+        />
+      )}
+
+      {usuarioDetalles && (
+        <VentanaModales
+          isOpen={isDetallesModalOpen}
+          onClose={() => setIsDetallesModalOpen(false)}
+          contenido={{
+            identificacion: usuarioDetalles.identificacion,
+            nombre: usuarioDetalles.nombre,
+            email: usuarioDetalles.email,
+            rol: usuarioDetalles.fk_id_rol?.nombre_rol || "—",
+          }}
+          titulo="Detalles del Usuario"
         />
       )}
     </div>
