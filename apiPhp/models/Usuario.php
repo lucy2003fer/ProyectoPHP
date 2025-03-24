@@ -29,6 +29,7 @@ class Usuario {
         }
     }
 
+    // Obtener un usuario por su ID
     public function getById($identificacion) {
         try {
             $query = "SELECT 
@@ -61,6 +62,7 @@ class Usuario {
         }
     }
 
+    // Crear un nuevo usuario
     public function crearUsuario($identificacion, $nombre, $contrasena, $email, $fk_id_rol) {
         try {
             $query = "INSERT INTO $this->table (identificacion, nombre, contrasena, email, fk_id_rol) 
@@ -83,6 +85,34 @@ class Usuario {
         }
     }
 
+    // Actualizar un usuario existente
+    public function actualizarUsuario($identificacion, $nombre, $contrasena, $email, $fk_id_rol) {
+        try {
+            $query = "UPDATE $this->table 
+                      SET nombre = :nombre, 
+                          contrasena = :contrasena, 
+                          email = :email, 
+                          fk_id_rol = :fk_id_rol 
+                      WHERE identificacion = :identificacion";
+            $stmt = $this->connect->prepare($query);
+
+            // Encriptar la contraseña antes de guardarla
+            $contrasenaEncriptada = password_hash($contrasena, PASSWORD_DEFAULT);
+
+            $stmt->bindParam(':nombre', $nombre);
+            $stmt->bindParam(':contrasena', $contrasenaEncriptada);
+            $stmt->bindParam(':email', $email);
+            $stmt->bindParam(':fk_id_rol', $fk_id_rol, PDO::PARAM_INT);
+            $stmt->bindParam(':identificacion', $identificacion, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            echo "Error en la base de datos: " . $e->getMessage();
+            return false;
+        }
+    }
+
+    // Eliminar un usuario por su ID
     public function eliminarUsuario($identificacion) {
         try {
             $query = "DELETE FROM $this->table WHERE identificacion = :identificacion";

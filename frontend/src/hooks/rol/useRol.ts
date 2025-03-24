@@ -7,17 +7,7 @@ export interface Rol {
   fecha_creacion : string;
 }
 
-// Definir el tipo de Usuario basado en la API
-interface Usuario {
-  identificacion: number;
-  nombre: string;
-  contrasena: string;
-  email: string;
-  fk_id_rol: Rol | null;
-}
-
-// Función para obtener los usuarios desde la API
-const fetchUsuarios = async (): Promise<Usuario[]> => {
+const fetchRol = async (): Promise<Rol[]> => {
   const apiUrl = import.meta.env.VITE_API_URL;
   const token = localStorage.getItem("token");
 
@@ -30,8 +20,8 @@ const fetchUsuarios = async (): Promise<Usuario[]> => {
   }
 
   try {
-    const { data } = await axios.get<{ status: number; data: Usuario[] }>(
-      `${apiUrl}/usuario`,
+    const { data } = await axios.get<{ status: number; data:Rol[] }>(
+      `${apiUrl}/rol`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -43,16 +33,16 @@ const fetchUsuarios = async (): Promise<Usuario[]> => {
 
     return data.data || []; // Asegurar que devuelve un array
   } catch (error: any) {
-    console.error("Error al obtener usuarios:", error);
-    throw new Error(error.response?.data?.message || "Error al obtener los usuarios");
+    console.error("Error al obtener roles:", error);
+    throw new Error(error.response?.data?.message || "Error al obtener los roles");
   }
 };
 
 // Hook personalizado para obtener usuarios
-export const useUsuarios = () => {
+export const useRol = () => {
   return useQuery({
-    queryKey: ["usuarios"], // Nombre clave del query
-    queryFn: fetchUsuarios,
+    queryKey: ["rol"], // Nombre clave del query
+    queryFn: fetchRol,
     select: (data) => (Array.isArray(data) ? data : []), // Validar el array
     staleTime: 1000 * 60 * 5, // Cache por 5 minutos
     retry: 2, // Reintentar 2 veces si hay error

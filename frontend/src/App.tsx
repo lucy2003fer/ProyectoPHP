@@ -4,6 +4,7 @@ import { HeroUIProvider } from "@heroui/system";
 import UsuarioPage from "./pages/UsuarioPage";
 import Login from "./components/usuarios/InicioSesion"
 import Principal from "./components/globales/Principal";
+import RolPage from "./pages/rol/RolPage";
 
 
 
@@ -17,7 +18,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/usuarios" element={<Principal><UsuarioPage /></Principal>} />
-
+          <Route path="rol" element={<Principal><RolPage /></Principal>} />
         </Routes>
       </QueryClientProvider>
     </HeroUIProvider>
