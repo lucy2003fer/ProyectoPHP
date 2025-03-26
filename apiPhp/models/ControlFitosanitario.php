@@ -89,4 +89,34 @@ class ControlFitosanitario {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE control_fitosanitario SET ";
+        $fields = [];
+    
+        if (isset($data['fecha_control'])) {
+            $fields[] = "fecha_control = :fecha_control";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+        if (isset($data['fk_id_desarrollan'])) {
+            $fields[] = "fk_id_desarrollan = :fk_id_desarrollan";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_control_fitosanitario = :id";
+        $stmt = $this->connect->prepare($query);
+    
+        if (isset($data['fecha_control'])) $stmt->bindParam(':fecha_control', $data['fecha_control'], PDO::PARAM_STR);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion'], PDO::PARAM_STR);
+        if (isset($data['fk_id_desarrollan'])) $stmt->bindParam(':fk_id_desarrollan', $data['fk_id_desarrollan'], PDO::PARAM_INT);
+    
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

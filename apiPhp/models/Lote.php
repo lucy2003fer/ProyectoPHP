@@ -95,4 +95,38 @@ class Lote {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE lote SET ";
+        $fields = [];
+    
+        if (isset($data['dimension'])) {
+            $fields[] = "dimension = :dimension";
+        }
+        if (isset($data['nombre_lote'])) {
+            $fields[] = "nombre_lote = :nombre_lote";
+        }
+        if (isset($data['fk_id_ubicacion'])) {
+            $fields[] = "fk_id_ubicacion = :fk_id_ubicacion";
+        }
+        if (isset($data['estado'])) {
+            $fields[] = "estado = :estado";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_lote = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['dimension'])) $stmt->bindParam(':dimension', $data['dimension'], PDO::PARAM_INT);
+        if (isset($data['nombre_lote'])) $stmt->bindParam(':nombre_lote', $data['nombre_lote']);
+        if (isset($data['fk_id_ubicacion'])) $stmt->bindParam(':fk_id_ubicacion', $data['fk_id_ubicacion'], PDO::PARAM_INT);
+        if (isset($data['estado'])) $stmt->bindParam(':estado', $data['estado']);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

@@ -71,4 +71,31 @@ class Plantacion {
             return false;
         }
     }
+
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE plantacion SET ";
+        $fields = [];
+    
+        if (isset($data['fk_id_cultivo'])) {
+            $fields[] = "fk_id_cultivo = :fk_id_cultivo";
+        }
+        if (isset($data['fk_id_era'])) {
+            $fields[] = "fk_id_era = :fk_id_era";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_plantacion = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['fk_id_cultivo'])) $stmt->bindParam(':fk_id_cultivo', $data['fk_id_cultivo'], PDO::PARAM_INT);
+        if (isset($data['fk_id_era'])) $stmt->bindParam(':fk_id_era', $data['fk_id_era'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

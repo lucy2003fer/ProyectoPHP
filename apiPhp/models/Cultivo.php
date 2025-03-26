@@ -69,4 +69,42 @@ class Cultivo {
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE cultivo SET ";
+        $fields = [];
+    
+        if (isset($data['fecha_plantacion'])) {
+            $fields[] = "fecha_plantacion = :fecha_plantacion";
+        }
+        if (isset($data['nombre_cultivo'])) {
+            $fields[] = "nombre_cultivo = :nombre_cultivo";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+        if (isset($data['fk_id_especie'])) {
+            $fields[] = "fk_id_especie = :fk_id_especie";
+        }
+        if (isset($data['fk_id_semillero'])) {
+            $fields[] = "fk_id_semillero = :fk_id_semillero";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_cultivo = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['fecha_plantacion'])) $stmt->bindParam(':fecha_plantacion', $data['fecha_plantacion']);
+        if (isset($data['nombre_cultivo'])) $stmt->bindParam(':nombre_cultivo', $data['nombre_cultivo']);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion']);
+        if (isset($data['fk_id_especie'])) $stmt->bindParam(':fk_id_especie', $data['fk_id_especie'], PDO::PARAM_INT);
+        if (isset($data['fk_id_semillero'])) $stmt->bindParam(':fk_id_semillero', $data['fk_id_semillero'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

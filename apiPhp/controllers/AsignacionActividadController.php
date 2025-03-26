@@ -53,7 +53,7 @@ class AsignacionActividadController {
                 return;
             }
 
-            if ($this->asignacionActividad->crearAsignacion($data['fecha'], $data['fk_id_actividad'], $data['fk_identificacion'])) {
+            if ($this->asignacionActividad->create($data['fecha'], $data['fk_id_actividad'], $data['fk_identificacion'])) {
                 echo json_encode(["message" => "Asignación creada exitosamente"]);
                 http_response_code(201);
             } else {
@@ -74,7 +74,7 @@ class AsignacionActividadController {
                 return;
             }
 
-            if ($this->asignacionActividad->actualizarAsignacion($id, $data['fecha'], $data['fk_id_actividad'], $data['fk_identificacion'])) {
+            if ($this->asignacionActividad->update($id, $data['fecha'], $data['fk_id_actividad'], $data['fk_identificacion'])) {
                 echo json_encode(["message" => "Asignación actualizada exitosamente"]);
                 http_response_code(200);
             } else {
@@ -87,7 +87,7 @@ class AsignacionActividadController {
     // Eliminar una asignación de actividad
     public function delete($id) {
         if ($_SERVER['REQUEST_METHOD'] == 'DELETE') {
-            if ($this->asignacionActividad->eliminarAsignacion($id)) {
+            if ($this->asignacionActividad->delete($id)) {
                 echo json_encode(["message" => "Asignación eliminada exitosamente"]);
                 http_response_code(200);
             } else {
@@ -96,4 +96,23 @@ class AsignacionActividadController {
             }
         }
     }
+
+    public function patch($id) {
+        $data = json_decode(file_get_contents("php://input"), true);
+    
+        if (empty($data)) {
+            http_response_code(400);
+            echo json_encode(["message" => "No se enviaron datos para actualizar"]);
+            return;
+        }
+    
+        if ($this->asignacionActividad->actualizarParcial($id, $data)) {
+            http_response_code(200);
+            echo json_encode(["message" => "Asignación de actividad actualizada correctamente"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Error al actualizar la asignación de actividad"]);
+        }
+    }
+    
 }

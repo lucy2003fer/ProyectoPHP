@@ -87,4 +87,30 @@ class Era {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE eras SET ";
+        $fields = [];
+    
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+        if (isset($data['fk_id_lote'])) {
+            $fields[] = "fk_id_lote = :fk_id_lote";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_eras = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion']);
+        if (isset($data['fk_id_lote'])) $stmt->bindParam(':fk_id_lote', $data['fk_id_lote'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

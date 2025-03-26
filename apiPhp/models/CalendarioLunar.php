@@ -90,4 +90,34 @@ class CalendarioLunar {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE calendario_lunar SET ";
+        $fields = [];
+    
+        if (isset($data['fecha'])) {
+            $fields[] = "fecha = :fecha";
+        }
+        if (isset($data['descripcion_evento'])) {
+            $fields[] = "descripcion_evento = :descripcion_evento";
+        }
+        if (isset($data['evento'])) {
+            $fields[] = "evento = :evento";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_calendario_lunar = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['fecha'])) $stmt->bindParam(':fecha', $data['fecha']);
+        if (isset($data['descripcion_evento'])) $stmt->bindParam(':descripcion_evento', $data['descripcion_evento']);
+        if (isset($data['evento'])) $stmt->bindParam(':evento', $data['evento']);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

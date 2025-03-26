@@ -53,4 +53,35 @@ class AsignacionActividad {
         $stmt->bindParam(":id", $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE asignacion_actividad SET ";
+        $fields = [];
+    
+        if (isset($data['fecha'])) {
+            $fields[] = "fecha = :fecha";
+        }
+        if (isset($data['fk_id_actividad'])) {
+            $fields[] = "fk_id_actividad = :fk_id_actividad";
+        }
+        if (isset($data['fk_identificacion'])) {
+            $fields[] = "fk_identificacion = :fk_identificacion";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_asignacion_actividad = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['fecha'])) $stmt->bindParam(':fecha', $data['fecha']);
+        if (isset($data['fk_id_actividad'])) $stmt->bindParam(':fk_id_actividad', $data['fk_id_actividad'], PDO::PARAM_INT);
+        if (isset($data['fk_identificacion'])) $stmt->bindParam(':fk_identificacion', $data['fk_identificacion'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

@@ -67,4 +67,43 @@ class Programacion {
         $stmt->bindParam(':id_programacion', $id, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE programacion SET ";
+        $fields = [];
+    
+        if (isset($data['estado'])) {
+            $fields[] = "estado = :estado";
+        }
+        if (isset($data['fecha_programada'])) {
+            $fields[] = "fecha_programada = :fecha_programada";
+        }
+        if (isset($data['duracion'])) {
+            $fields[] = "duracion = :duracion";
+        }
+        if (isset($data['fk_id_asignacion_actividad'])) {
+            $fields[] = "fk_id_asignacion_actividad = :fk_id_asignacion_actividad";
+        }
+        if (isset($data['fk_id_calendario_lunar'])) {
+            $fields[] = "fk_id_calendario_lunar = :fk_id_calendario_lunar";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_programacion = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['estado'])) $stmt->bindParam(':estado', $data['estado']);
+        if (isset($data['fecha_programada'])) $stmt->bindParam(':fecha_programada', $data['fecha_programada']);
+        if (isset($data['duracion'])) $stmt->bindParam(':duracion', $data['duracion'], PDO::PARAM_INT);
+        if (isset($data['fk_id_asignacion_actividad'])) $stmt->bindParam(':fk_id_asignacion_actividad', $data['fk_id_asignacion_actividad'], PDO::PARAM_INT);
+        if (isset($data['fk_id_calendario_lunar'])) $stmt->bindParam(':fk_id_calendario_lunar', $data['fk_id_calendario_lunar'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+
+    
 }

@@ -90,4 +90,34 @@ class ControlUsaInsumo {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE control_usa_insumo SET ";
+        $fields = [];
+    
+        if (isset($data['fk_id_insumo'])) {
+            $fields[] = "fk_id_insumo = :fk_id_insumo";
+        }
+        if (isset($data['fk_id_control_fitosanitario'])) {
+            $fields[] = "fk_id_control_fitosanitario = :fk_id_control_fitosanitario";
+        }
+        if (isset($data['cantidad'])) {
+            $fields[] = "cantidad = :cantidad";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_control_usa_insumo = :id";
+        $stmt = $this->connect->prepare($query);
+    
+        if (isset($data['fk_id_insumo'])) $stmt->bindParam(':fk_id_insumo', $data['fk_id_insumo'], PDO::PARAM_INT);
+        if (isset($data['fk_id_control_fitosanitario'])) $stmt->bindParam(':fk_id_control_fitosanitario', $data['fk_id_control_fitosanitario'], PDO::PARAM_INT);
+        if (isset($data['cantidad'])) $stmt->bindParam(':cantidad', $data['cantidad'], PDO::PARAM_INT);
+    
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

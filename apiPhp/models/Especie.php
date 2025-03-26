@@ -97,4 +97,38 @@ class Especie {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE especie SET ";
+        $fields = [];
+    
+        if (isset($data['nombre_comun'])) {
+            $fields[] = "nombre_comun = :nombre_comun";
+        }
+        if (isset($data['nombre_cientifico'])) {
+            $fields[] = "nombre_cientifico = :nombre_cientifico";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+        if (isset($data['fk_id_tipo_cultivo'])) {
+            $fields[] = "fk_id_tipo_cultivo = :fk_id_tipo_cultivo";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_especie = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['nombre_comun'])) $stmt->bindParam(':nombre_comun', $data['nombre_comun']);
+        if (isset($data['nombre_cientifico'])) $stmt->bindParam(':nombre_cientifico', $data['nombre_cientifico']);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion']);
+        if (isset($data['fk_id_tipo_cultivo'])) $stmt->bindParam(':fk_id_tipo_cultivo', $data['fk_id_tipo_cultivo'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

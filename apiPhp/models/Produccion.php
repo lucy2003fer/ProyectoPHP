@@ -102,4 +102,50 @@ class Produccion {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE produccion SET ";
+        $fields = [];
+    
+        if (isset($data['fk_id_cultivo'])) {
+            $fields[] = "fk_id_cultivo = :fk_id_cultivo";
+        }
+        if (isset($data['cantidad_producida'])) {
+            $fields[] = "cantidad_producida = :cantidad_producida";
+        }
+        if (isset($data['fecha_produccion'])) {
+            $fields[] = "fecha_produccion = :fecha_produccion";
+        }
+        if (isset($data['fk_id_lote'])) {
+            $fields[] = "fk_id_lote = :fk_id_lote";
+        }
+        if (isset($data['descripcion_produccion'])) {
+            $fields[] = "descripcion_produccion = :descripcion_produccion";
+        }
+        if (isset($data['estado'])) {
+            $fields[] = "estado = :estado";
+        }
+        if (isset($data['fecha_cosecha'])) {
+            $fields[] = "fecha_cosecha = :fecha_cosecha";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_produccion = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['fk_id_cultivo'])) $stmt->bindParam(':fk_id_cultivo', $data['fk_id_cultivo'], PDO::PARAM_INT);
+        if (isset($data['cantidad_producida'])) $stmt->bindParam(':cantidad_producida', $data['cantidad_producida'], PDO::PARAM_INT);
+        if (isset($data['fecha_produccion'])) $stmt->bindParam(':fecha_produccion', $data['fecha_produccion'], PDO::PARAM_STR);
+        if (isset($data['fk_id_lote'])) $stmt->bindParam(':fk_id_lote', $data['fk_id_lote'], PDO::PARAM_INT);
+        if (isset($data['descripcion_produccion'])) $stmt->bindParam(':descripcion_produccion', $data['descripcion_produccion'], PDO::PARAM_STR);
+        if (isset($data['estado'])) $stmt->bindParam(':estado', $data['estado'], PDO::PARAM_STR);
+        if (isset($data['fecha_cosecha'])) $stmt->bindParam(':fecha_cosecha', $data['fecha_cosecha'], PDO::PARAM_STR);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

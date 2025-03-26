@@ -90,4 +90,34 @@ class Notificacion {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE notificacion SET ";
+        $fields = [];
+    
+        if (isset($data['titulo'])) {
+            $fields[] = "titulo = :titulo";
+        }
+        if (isset($data['mensaje'])) {
+            $fields[] = "mensaje = :mensaje";
+        }
+        if (isset($data['fk_id_programacion'])) {
+            $fields[] = "fk_id_programacion = :fk_id_programacion";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_notificacion = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['titulo'])) $stmt->bindParam(':titulo', $data['titulo']);
+        if (isset($data['mensaje'])) $stmt->bindParam(':mensaje', $data['mensaje']);
+        if (isset($data['fk_id_programacion'])) $stmt->bindParam(':fk_id_programacion', $data['fk_id_programacion'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

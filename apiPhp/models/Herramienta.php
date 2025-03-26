@@ -90,4 +90,30 @@ class Herramienta {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        try {
+            $fields = [];
+            foreach ($data as $key => $value) {
+                $fields[] = "$key = :$key";
+            }
+
+            if (empty($fields)) {
+                return false;
+            }
+
+            $query = "UPDATE $this->table SET " . implode(", ", $fields) . " WHERE id_herramienta = :id";
+            $stmt = $this->connect->prepare($query);
+
+            foreach ($data as $key => &$value) {
+                $stmt->bindParam(":$key", $value);
+            }
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error al actualizar herramienta: " . $e->getMessage());
+            return false;
+        }
+    }
 }

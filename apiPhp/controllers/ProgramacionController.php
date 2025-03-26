@@ -93,4 +93,23 @@ class ProgramacionController {
             }
         }
     }
+
+    public function patch($id) {
+        $data = json_decode(file_get_contents("php://input"), true);
+    
+        if (empty($data)) {
+            http_response_code(400);
+            echo json_encode(["message" => "No se enviaron datos para actualizar"]);
+            return;
+        }
+    
+        if ($this->programacion->actualizarParcial($id, $data)) {
+            http_response_code(200);
+            echo json_encode(["message" => "Programación actualizada correctamente"]);
+        } else {
+            http_response_code(500);
+            echo json_encode(["message" => "Error al actualizar la programación"]);
+        }
+    }
+    
 }

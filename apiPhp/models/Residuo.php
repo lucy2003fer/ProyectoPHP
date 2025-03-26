@@ -96,4 +96,42 @@ class Residuo {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE residuos SET ";
+        $fields = [];
+    
+        if (isset($data['nombre'])) {
+            $fields[] = "nombre = :nombre";
+        }
+        if (isset($data['fecha'])) {
+            $fields[] = "fecha = :fecha";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+        if (isset($data['fk_id_tipo_residuo'])) {
+            $fields[] = "fk_id_tipo_residuo = :fk_id_tipo_residuo";
+        }
+        if (isset($data['fk_id_cultivo'])) {
+            $fields[] = "fk_id_cultivo = :fk_id_cultivo";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_residuo = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['nombre'])) $stmt->bindParam(':nombre', $data['nombre'], PDO::PARAM_STR);
+        if (isset($data['fecha'])) $stmt->bindParam(':fecha', $data['fecha'], PDO::PARAM_STR);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion'], PDO::PARAM_STR);
+        if (isset($data['fk_id_tipo_residuo'])) $stmt->bindParam(':fk_id_tipo_residuo', $data['fk_id_tipo_residuo'], PDO::PARAM_INT);
+        if (isset($data['fk_id_cultivo'])) $stmt->bindParam(':fk_id_cultivo', $data['fk_id_cultivo'], PDO::PARAM_INT);
+    
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }
