@@ -101,4 +101,42 @@ class Venta {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE venta SET ";
+        $fields = [];
+    
+        if (isset($data['fk_id_produccion'])) {
+            $fields[] = "fk_id_produccion = :fk_id_produccion";
+        }
+        if (isset($data['cantidad'])) {
+            $fields[] = "cantidad = :cantidad";
+        }
+        if (isset($data['precio_unitario'])) {
+            $fields[] = "precio_unitario = :precio_unitario";
+        }
+        if (isset($data['total_venta'])) {
+            $fields[] = "total_venta = :total_venta";
+        }
+        if (isset($data['fecha_venta'])) {
+            $fields[] = "fecha_venta = :fecha_venta";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_venta = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['fk_id_produccion'])) $stmt->bindParam(':fk_id_produccion', $data['fk_id_produccion'], PDO::PARAM_INT);
+        if (isset($data['cantidad'])) $stmt->bindParam(':cantidad', $data['cantidad'], PDO::PARAM_INT);
+        if (isset($data['precio_unitario'])) $stmt->bindParam(':precio_unitario', $data['precio_unitario'], PDO::PARAM_INT);
+        if (isset($data['total_venta'])) $stmt->bindParam(':total_venta', $data['total_venta'], PDO::PARAM_INT);
+        if (isset($data['fecha_venta'])) $stmt->bindParam(':fecha_venta', $data['fecha_venta'], PDO::PARAM_STR);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

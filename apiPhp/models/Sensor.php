@@ -107,4 +107,46 @@ class Sensor {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE sensores SET ";
+        $fields = [];
+    
+        if (isset($data['nombre_sensor'])) {
+            $fields[] = "nombre_sensor = :nombre_sensor";
+        }
+        if (isset($data['tipo_sensor'])) {
+            $fields[] = "tipo_sensor = :tipo_sensor";
+        }
+        if (isset($data['unidad_medida'])) {
+            $fields[] = "unidad_medida = :unidad_medida";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+        if (isset($data['medida_minima'])) {
+            $fields[] = "medida_minima = :medida_minima";
+        }
+        if (isset($data['medida_maxima'])) {
+            $fields[] = "medida_maxima = :medida_maxima";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_sensor = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['nombre_sensor'])) $stmt->bindParam(':nombre_sensor', $data['nombre_sensor'], PDO::PARAM_STR);
+        if (isset($data['tipo_sensor'])) $stmt->bindParam(':tipo_sensor', $data['tipo_sensor'], PDO::PARAM_STR);
+        if (isset($data['unidad_medida'])) $stmt->bindParam(':unidad_medida', $data['unidad_medida'], PDO::PARAM_STR);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion'], PDO::PARAM_STR);
+        if (isset($data['medida_minima'])) $stmt->bindParam(':medida_minima', $data['medida_minima'], PDO::PARAM_STR);
+        if (isset($data['medida_maxima'])) $stmt->bindParam(':medida_maxima', $data['medida_maxima'], PDO::PARAM_STR);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

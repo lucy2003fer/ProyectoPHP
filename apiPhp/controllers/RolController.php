@@ -96,4 +96,28 @@ class RolController {
             }
         }
     }
+
+
+    public function patch($id) {
+        if ($_SERVER['REQUEST_METHOD'] == 'PATCH') {
+            $data = json_decode(file_get_contents("php://input"), true);
+    
+            if (empty($data)) {
+                echo json_encode(["message" => "No se enviaron datos para actualizar"]);
+                http_response_code(400);
+                return;
+            }
+    
+            if ($this->rol->actualizarParcial($id, $data)) {
+                echo json_encode(["message" => "Usuario actualizado parcialmente"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error al actualizar usuario"]);
+                http_response_code(500);
+            }
+        }
+    }
+    
 }
+
+

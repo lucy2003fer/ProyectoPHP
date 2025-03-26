@@ -1,15 +1,18 @@
 <?php
 
-class Usuario {
+class Usuario
+{
     private $connect;
     private $table = "usuarios";
 
-    public function __construct($db) {
+    public function __construct($db)
+    {
         $this->connect = $db;
     }
 
     // Obtener todos los usuarios con el nombre del rol
-    public function getAll() {
+    public function getAll()
+    {
         $query = "SELECT 
                     u.identificacion, 
                     u.nombre, 
@@ -30,7 +33,8 @@ class Usuario {
     }
 
     // Obtener un usuario por su ID
-    public function getById($identificacion) {
+    public function getById($identificacion)
+    {
         try {
             $query = "SELECT 
                         u.identificacion, 
@@ -45,7 +49,7 @@ class Usuario {
 
             $stmt = $this->connect->prepare($query);
             $stmt->bindParam(':identificacion', $identificacion, PDO::PARAM_INT);
-    
+
             if ($stmt->execute()) {
                 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
                 if ($usuario) {
@@ -63,7 +67,8 @@ class Usuario {
     }
 
     // Crear un nuevo usuario
-    public function crearUsuario($identificacion, $nombre, $contrasena, $email, $fk_id_rol) {
+    public function crearUsuario($identificacion, $nombre, $contrasena, $email, $fk_id_rol)
+    {
         try {
             $query = "INSERT INTO $this->table (identificacion, nombre, contrasena, email, fk_id_rol) 
                       VALUES (:identificacion, :nombre, :contrasena, :email, :fk_id_rol)";
@@ -86,7 +91,8 @@ class Usuario {
     }
 
     // Actualizar un usuario existente
-    public function actualizarUsuario($identificacion, $nombre, $contrasena, $email, $fk_id_rol) {
+    public function actualizarUsuario($identificacion, $nombre, $contrasena, $email, $fk_id_rol)
+    {
         try {
             $query = "UPDATE $this->table 
                       SET nombre = :nombre, 
@@ -113,7 +119,8 @@ class Usuario {
     }
 
     // Eliminar un usuario por su ID
-    public function eliminarUsuario($identificacion) {
+    public function eliminarUsuario($identificacion)
+    {
         try {
             $query = "DELETE FROM $this->table WHERE identificacion = :identificacion";
             $stmt = $this->connect->prepare($query);
@@ -124,4 +131,32 @@ class Usuario {
             return false;
         }
     }
+
+
+    public function actualizarParcial($id, $data) {
+        try {
+            $fields = [];
+            foreach ($data as $key => $value) {
+                $fields[] = "$key = :$key";
+            }
+
+            if (empty($fields)) {
+                return false;
+            }
+
+            $query = "UPDATE $this->table SET " . implode(", ", $fields) . " WHERE identificacion = :id";
+            $stmt = $this->connect->prepare($query);
+
+            foreach ($data as $key => &$value) {
+                $stmt->bindParam(":$key", $value);
+            }
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error al actualizar usuario: " . $e->getMessage());
+            return false;
+        }
+    }
+    
 }

@@ -1,20 +1,23 @@
-<?php 
+<?php
 
 require_once("./config/database.php");
 require_once("./models/Usuario.php");
 
-class UsuarioController {
+class UsuarioController
+{
     private $db;
     private $usuario;
 
-    public function __construct() {
+    public function __construct()
+    {
         $database = new Database();
         $this->db = $database->getConection();
         $this->usuario = new Usuario($this->db);
     }
 
     // Obtener todos los usuarios
-    public function getAll() {
+    public function getAll()
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
@@ -32,7 +35,7 @@ class UsuarioController {
                 "contrasena" => $usuario["contrasena"],
                 "email" => $usuario["email"],
                 "fk_id_rol" => [
-                    "id_rol" => $usuario["id_rol"] ?? null, 
+                    "id_rol" => $usuario["id_rol"] ?? null,
                     "nombre_rol" => $usuario["nombre_rol"] ?? "Sin rol asignado"
                 ]
             ];
@@ -46,7 +49,8 @@ class UsuarioController {
     }
 
     // Obtener un usuario por ID
-    public function getById($identificacion) {
+    public function getById($identificacion)
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
@@ -63,7 +67,7 @@ class UsuarioController {
                     "contrasena" => $usuario["contrasena"],
                     "email" => $usuario["email"],
                     "fk_id_rol" => [
-                        "id_rol" => $usuario["id_rol"] ?? null, 
+                        "id_rol" => $usuario["id_rol"] ?? null,
                         "nombre_rol" => $usuario["nombre_rol"] ?? "Sin rol asignado"
                     ]
                 ]
@@ -76,7 +80,8 @@ class UsuarioController {
     }
 
     // Crear un usuario
-    public function create() {
+    public function create()
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
@@ -84,7 +89,7 @@ class UsuarioController {
         }
 
         $data = json_decode(file_get_contents("php://input"), true);
-        
+
         if (!isset($data['identificacion'], $data['nombre'], $data['contrasena'], $data['email'], $data['fk_id_rol'])) {
             echo json_encode(["message" => "Datos incompletos"]);
             http_response_code(400);
@@ -101,7 +106,8 @@ class UsuarioController {
     }
 
     // Actualizar un usuario
-    public function update($identificacion) {
+    public function update($identificacion)
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
@@ -109,7 +115,7 @@ class UsuarioController {
         }
 
         $data = json_decode(file_get_contents("php://input"), true);
-        
+
         if (!isset($data['nombre'], $data['contrasena'], $data['email'], $data['fk_id_rol'])) {
             echo json_encode(["message" => "Datos incompletos"]);
             http_response_code(400);
@@ -126,7 +132,8 @@ class UsuarioController {
     }
 
     // Eliminar un usuario
-    public function delete($identificacion) {
+    public function delete($identificacion)
+    {
         if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
             http_response_code(405);
             echo json_encode(["message" => "Método no permitido"]);
@@ -141,4 +148,26 @@ class UsuarioController {
             http_response_code(500);
         }
     }
+
+
+    public function patch($id) {
+        if ($_SERVER['REQUEST_METHOD'] == 'PATCH') {
+            $data = json_decode(file_get_contents("php://input"), true);
+    
+            if (empty($data)) {
+                echo json_encode(["message" => "No se enviaron datos para actualizar"]);
+                http_response_code(400);
+                return;
+            }
+    
+            if ($this->usuario->actualizarParcial($id, $data)) {
+                echo json_encode(["message" => "Usuario actualizado parcialmente"]);
+                http_response_code(200);
+            } else {
+                echo json_encode(["message" => "Error al actualizar usuario"]);
+                http_response_code(500);
+            }
+        }
+    }
+    
 }

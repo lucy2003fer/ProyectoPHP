@@ -87,4 +87,30 @@ class TipoResiduo {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE tipo_residuos SET ";
+        $fields = [];
+    
+        if (isset($data['nombre_residuo'])) {
+            $fields[] = "nombre_residuo = :nombre_residuo";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_tipo_residuo = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['nombre_residuo'])) $stmt->bindParam(':nombre_residuo', $data['nombre_residuo'], PDO::PARAM_STR);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion'], PDO::PARAM_STR);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

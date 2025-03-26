@@ -87,4 +87,30 @@ class TipoCultivo {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE tipo_cultivo SET ";
+        $fields = [];
+    
+        if (isset($data['nombre'])) {
+            $fields[] = "nombre = :nombre";
+        }
+        if (isset($data['descripcion'])) {
+            $fields[] = "descripcion = :descripcion";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_tipo_cultivo = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['nombre'])) $stmt->bindParam(':nombre', $data['nombre']);
+        if (isset($data['descripcion'])) $stmt->bindParam(':descripcion', $data['descripcion']);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

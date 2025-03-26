@@ -97,4 +97,38 @@ class Semillero {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE semilleros SET ";
+        $fields = [];
+    
+        if (isset($data['nombre_semilla'])) {
+            $fields[] = "nombre_semilla = :nombre_semilla";
+        }
+        if (isset($data['fecha_siembra'])) {
+            $fields[] = "fecha_siembra = :fecha_siembra";
+        }
+        if (isset($data['fecha_estimada'])) {
+            $fields[] = "fecha_estimada = :fecha_estimada";
+        }
+        if (isset($data['cantidad'])) {
+            $fields[] = "cantidad = :cantidad";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_semillero = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['nombre_semilla'])) $stmt->bindParam(':nombre_semilla', $data['nombre_semilla']);
+        if (isset($data['fecha_siembra'])) $stmt->bindParam(':fecha_siembra', $data['fecha_siembra']);
+        if (isset($data['fecha_estimada'])) $stmt->bindParam(':fecha_estimada', $data['fecha_estimada']);
+        if (isset($data['cantidad'])) $stmt->bindParam(':cantidad', $data['cantidad'], PDO::PARAM_INT);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }

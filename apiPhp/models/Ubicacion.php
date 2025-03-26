@@ -87,4 +87,30 @@ class Ubicacion {
             return false;
         }
     }
+
+    public function actualizarParcial($id, $data) {
+        $query = "UPDATE ubicacion SET ";
+        $fields = [];
+    
+        if (isset($data['latitud'])) {
+            $fields[] = "latitud = :latitud";
+        }
+        if (isset($data['longitud'])) {
+            $fields[] = "longitud = :longitud";
+        }
+    
+        if (empty($fields)) {
+            return false;
+        }
+    
+        $query .= implode(", ", $fields) . " WHERE id_ubicacion = :id";
+        $stmt = $this->connect->prepare($query);
+        
+        if (isset($data['latitud'])) $stmt->bindParam(':latitud', $data['latitud']);
+        if (isset($data['longitud'])) $stmt->bindParam(':longitud', $data['longitud']);
+        
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
+    }
+    
 }
