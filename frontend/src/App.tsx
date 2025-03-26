@@ -7,6 +7,8 @@ import Principal from "./components/globales/Principal";
 import RolPage from "./pages/rol/RolPage";
 import CrearUsuarioPage from "./pages/usuarios/CrearUsuarioPage";
 import CrearRolPage from "./pages/rol/CrearRolPage";
+import CrearTipoPage from "./pages/tipo_cultivo/CrearTipoPage";
+import TipoCultivoPage from "./pages/tipo_cultivo/TipoCultivoPage";
 
 
 
@@ -24,6 +26,12 @@ function App() {
           
           <Route path="rol" element={<Principal><RolPage /></Principal>} />
           <Route path="crearrol" element={<Principal><CrearRolPage /></Principal>} />
+
+          <Route path="tipocultivo" element={<Principal><TipoCultivoPage /></Principal>} />
+          <Route path="creartipo" element={<Principal><CrearTipoPage /></Principal>} />
+
+
+
         </Routes>
       </QueryClientProvider>
     </HeroUIProvider>
